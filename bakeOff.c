@@ -16,6 +16,8 @@ char *pizza_ingredients[] = {"Yeast", "Sugar", "Salt"};
 char *pretzel_ingredients[] = {"Flour", "Sugar", "Salt", "Yeast", "Baking soda", "Egg"};
 char *cinnamon_rolls_ingredients[] = {"Flour", "Sugar", "Salt", "Butter", "Egg", "Cinnamon"};
 
+int color;
+
 // Declare functions
 void getIngredient(char *ingredient, int baker);
 void makeRecipe(char *ingredientList[], int ingredientNum, int baker, char *recipe);
@@ -61,18 +63,24 @@ int main()
   sem_destroy(&bowl);
   sem_destroy(&spoon);
 
+  printf("\033[0m");
+  printf("All baking has been completed!\n");
+
   return 0;
 }
 
 void getIngredient(char *ingredientName, int bakerId)
 {
+  color = 31 + (bakerId % 8);
+  printf("\033[0;%dm", color);
   printf("Baker #%d is getting the ingredient: %s\n", bakerId, ingredientName);
   usleep(1000000); // Need to set as time fetching ingrident
 }
 
 void makeRecipe(char *ingredientList[], int ingredientNum, int bakerId, char *recipeName)
 {
-
+  color = 31 + (bakerId % 8);
+  printf("\033[0;%dm", color);
   printf("Baker #%d is starting to make: %s\n", bakerId, recipeName);
 
   // Collect Ingredients
@@ -83,24 +91,36 @@ void makeRecipe(char *ingredientList[], int ingredientNum, int bakerId, char *re
 
   // Once ingredients have been aquired collect the tools
   sem_wait(&bowl);
+  color = 31 + (bakerId % 8);
+  printf("\033[0;%dm", color);
   printf("Baker #%d acquired a bowl for making: %s\n", bakerId, recipeName);
 
   sem_wait(&spoon);
+  color = 31 + (bakerId % 8);
+  printf("\033[0;%dm", color);
   printf("Baker #%d acquired a spoon for making: %s\n", bakerId, recipeName);
 
   sem_wait(&mixer);
+  color = 31 + (bakerId % 8);
+  printf("\033[0;%dm", color);
   printf("Baker #%d acquired a mixer for making: %s\n", bakerId, recipeName);
 
   // Once ingredients and tools have been aquired put into oven
   sem_wait(&oven);
+  color = 31 + (bakerId % 8);
+  printf("\033[0;%dm", color);
   printf("Baker #%d has started baking %s in the oven\n", bakerId, recipeName);
 
-  usleep(1000000); // Need to set time for baking
+  usleep(3000000); // Need to set time for baking
 
   sem_post(&oven);
+  color = 31 + (bakerId % 8);
+  printf("\033[0;%dm", color);
   printf("Baker #%d has finished baking: %s\n", bakerId, recipeName);
 
   // Once finished free up used tools
+  color = 31 + (bakerId % 8);
+  printf("\033[0;%dm", color);
   printf("Baker #%d has finished using bowl for: %s\n", bakerId, recipeName);
   printf("Baker #%d has finished using spoon for: %s\n", bakerId, recipeName);
   printf("Baker #%d has finished using mixer for: %s\n", bakerId, recipeName);
@@ -112,6 +132,8 @@ void makeRecipe(char *ingredientList[], int ingredientNum, int bakerId, char *re
 
 void bakeRecipes(int bakerId)
 {
+  color = 31 + (bakerId % 8);
+  printf("\033[0;%dm", color);
   printf("Baker #%d is starting to bake!\n", bakerId);
 
   // Make each recipe
@@ -121,5 +143,7 @@ void bakeRecipes(int bakerId)
   makeRecipe(pretzel_ingredients, 6, bakerId, "Soft Pretzels");
   makeRecipe(cinnamon_rolls_ingredients, 6, bakerId, "Cinnamon Rolls");
 
+  color = 31 + (bakerId % 8);
+  printf("\033[0;%dm", color);
   printf("Baker #%d has finished baking all recipies!\n", bakerId);
 }
