@@ -6,7 +6,7 @@
 
 // Declared shared resources
 sem_t pantry;
-sem_t refrigerator1, refrigerator2;
+sem_t refrigerators;
 sem_t mixer, bowl, spoon;
 sem_t oven;
 
@@ -35,8 +35,7 @@ int main()
   pthread_t bakers[numBakers];
 
   sem_init(&pantry, 0, 1);
-  sem_init(&refrigerator1, 0, 1);
-  sem_init(&refrigerator2, 0, 1);
+  sem_init(&refrigerators, 0, 2);
   sem_init(&mixer, 0, 2);
   sem_init(&oven, 0, 1);
   sem_init(&bowl, 0, 3);
@@ -56,8 +55,7 @@ int main()
 
   // Remove all semaphores from shared memory
   sem_destroy(&pantry);
-  sem_destroy(&refrigerator1);
-  sem_destroy(&refrigerator2);
+  sem_destroy(&refrigerators);
   sem_destroy(&mixer);
   sem_destroy(&oven);
   sem_destroy(&bowl);
@@ -74,7 +72,27 @@ void getIngredient(char *ingredientName, int bakerId)
   color = 31 + (bakerId % 8);
   printf("\033[0;%dm", color);
   printf("Baker #%d is getting the ingredient: %s\n", bakerId, ingredientName);
-  usleep(1000000); // Need to set as time fetching ingrident
+
+  if (ingredientName == "Flour" || ingredientName == "Sugar" || ingredientName == "Baking soda" || ingredientName == "Salt" || ingredientName == "Yeast" || ingredientName == "Cinnamon")
+  {
+    sem_wait(&pantry);
+
+    printf("\033[0;%dm", color);
+    printf("Baker #%d is getting %s from the pantry\n", bakerId, ingredientName);
+
+    usleep(1000000); // Need to set as time to fetch ingredient
+    sem_post(&pantry);
+  }
+  else
+  {
+    sem_wait(&refrigerators);
+
+    printf("\033[0;%dm", color);
+    printf("Baker #%d is getting %s from the refrigerator\n", bakerId, ingredientName);
+
+    usleep(1000000); // Need to set as time to fetch ingredient
+    sem_post(&refrigerators);
+  }
 }
 
 void makeRecipe(char *ingredientList[], int ingredientNum, int bakerId, char *recipeName)
